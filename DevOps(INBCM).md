@@ -161,15 +161,17 @@ https://docs.docker.com/engine/install/  (Aqui vai encontra a instalção tanto 
 
 3º Após criarmos a imagem podemos verificar se realmete foi criada usando:
 
-- docker ps
+- docker images
 
-vai aparecer uma lista de imagens é nela deve ter aque acabamos de criar
+3.1 Vai aparecer assim.
+
+![Docker_images](/imagens/Docker_images.png)
 
 4º Para rodar essa imagem usamos:
 
 - docker run exemplo/hello
 
-e ela vai executar o que foi escrito no Dockerfile.
+vai executar o que foi escrito no Dockerfile.
 
 
 # 3º Portainer
@@ -196,7 +198,7 @@ No portainer atualmente temos 4 stacks:
 |inbcm-dev                  |  dev   |    
 |dev_curadoria_ifrn         |  dev   |  
 
-Ao clicar em uma delas vai abrir o gerenciador de stacks e lá temos essa duas opções
+Ao clicar em uma delas vai abrir o gerenciador de stacks e lá temos essas duas opções
 
 ![Gerenciador_stack](imagens/Gerenciador_stack.png)
 
@@ -356,6 +358,98 @@ _**Docker-compose (inbcm-dev)**_
             - traefik.http.routers.dev-inbcm-admin-https.tls.certresolver=le           | 
             - traefik.http.services.dev-inbcm-admin.loadbalancer.server.port=8080      | 
     -----------------------------------------------------------------------------------|
+
+
+_**Docker-compose (dev_curadoria_ifrn )**_
+
+        
+    version: '3.5'   |  Versão do compose 
+
+    -----------------------|
+    networks:              | 
+    traefik_proxy:         |Informa a rede dessa 
+        external: true     |compose.
+    -----------------------|
+
+    ---------------------------------------------------------|
+    volumes:                                                 |       
+        homologacaocuradoria_www:                            | 
+            driver: local                                    |   
+            driver_opts:                                     |Informa o local de 
+            type: nfs                                        |armazenamento desse
+            o: nfsvers=4,addr=10.10.10.100,rw                |compose.
+            device: ":/NFS_VOL/HDD/homologacao_curadoria"    |
+    ---------------------------------------------------------|   
+        
+    --------------------------------------------------------------|    
+    services:                                                     |
+    tainacan:                                                     |
+        image: tainacan/php:7.4-fpm-apache                        |Configurações básicas de imagem    
+        networks:                                                 |rede e variável de ambiente.
+        - traefik_proxy                                           |
+        environment:                                              |
+        SKIP_WP_INSTALL: "false"                                  |          
+    --------------------------------------------------------------|
+        #site config:                                             |  
+        SITE_LANGUAGE: pt_BR                                      |  
+        SITE_URL: ***                                             |  
+        SITE_TITLE: ***                                           |Variáveis ambientes de configuração  
+        SITE_ADMIN_USER: ***                                      |do site.
+        SITE_ADMIN_EMAIL: ***                                     |  
+        SITE_ADMIN_PASSWORD: ***                                  |  
+    --------------------------------------------------------------|  
+        #wordpress config:                                        | 
+        DBNAME: ***                                               |Variáveis ambientes de configuração
+        DB_USER: ***                                              |do wordpress.
+        DB_PSWD: ***                                              |      
+        DB_HOST: ***                                              |  
+    --------------------------------------------------------------|
+        #APACHE,PHP,FPM config                                    |  
+        PHP_POST_MAX_SIZE: ***                                    |  
+        PHP_UPLOAD_MAX_FILE_SIZE: ***                             |
+        PHP_MAX_EXECUTION_TIME: ***                               |  
+        PHP_MEMORY_LIMIT: ***                                     |
+        PHP_POOL_NAME: ***                                        |  
+        PHP_DATE_TIMEZONE: ***                                    |  
+        PHP_DISPLAY_ERRORS: ***                                   |      
+        PHP_ERROR_REPORTING: ***                                  | 
+        PHP_PM_CONTROL: ***                                       |  
+        PHP_PM_MAX_CHILDREN: ***                                  |  
+        PHP_PM_START_SERVERS: ***                                 |     
+        PHP_PM_MIN_SPARE_SERVERS: ***                             | 
+        PHP_PM_MAX_SPARE_SERVERS: ***                             |Variáveis ambientes de configuração
+        MSMTP_RELAY_SERVER_HOSTNAME: ***                          |do APACHE,PHP e FPM.
+        MSMTP_RELAY_SERVER_PORT: ***                              |
+        APACHE_DOCUMENT_ROOT: ***                                 |  
+        APACHE_START_SERVERS: ***                                 |      
+        APACHE_MIN_SPARE_THREADS: ***                             |  
+        APACHE_MAX_SPARE_THREADS: ***                             |  
+        APACHE_THREAD_LIMIT: ***                                  |  
+        APACHE_THREADS_PER_CHILD: ***                             |
+        APACHE_MAX_REQUEST_WORKERS: ***                           |  
+        APACHE_MAX_CONNECTIONS_PER_CHILD: ***                     |  
+        APACHE_RUN_USER: ***                                      |  
+        APACHE_RUN_GROUP: ***                                     |  
+    --------------------------------------------------------------| 
+
+    ------------------------------------------------------------------------------------------------------------|
+        deploy:                                                                                                 |
+        labels:                                                                                                 |    
+            - traefik.enable=true                                                                               |
+            - traefik.docker.network=traefik_proxy                                                              |
+            - traefik.constraint-label=traefik-public                                                           |
+                                                                                                                |   
+            - traefik.http.routers.wphomologacaocuradoria-http.rule=Host(`homologacao.curadoria.tainacan.org`)  |
+            - traefik.http.routers.wphomologacaocuradoria-http.entrypoints=http                                 |
+            - traefik.http.routers.wphomologacaocuradoria-http.middlewares=https-redirect                       |Essa etapa não diferente das anteriores
+            - traefik.http.routers.wphomologacaocuradoria-https.rule=Host(`homologacao.curadoria.tainacan.org`) |informa ao traefik as rotas o protocolo,
+            - traefik.http.routers.wphomologacaocuradoria-https.entrypoints=https                               |domínio, certificado e porta.
+            - traefik.http.routers.wphomologacaocuradoria-https.tls=true                                        |
+            - traefik.http.routers.wphomologacaocuradoria-https.tls.certresolver=le                             |
+            - traefik.http.services.wphomologacaocuradoria.loadbalancer.server.port=80                          |
+        volumes:                                                                                                |
+        - homologacaocuradoria_www:/var/www/html/                                                               |
+    ------------------------------------------------------------------------------------------------------------|        
 
 
 Temos os seguinte desenhos lógicos para melhor visualização da infra:
