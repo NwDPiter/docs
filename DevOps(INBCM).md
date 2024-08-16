@@ -499,8 +499,8 @@ Temos os seguinte desenhos lógicos para melhor visualização da infra:
 
 Servidor UNB (IP: 164.41.122.172)
 
-    - Portas abertas: (80:443)
-    - Sem acesso SSH
+- Portas abertas: (80:443)
+- Sem acesso SSH
 
 O servidor consiste em :
 
