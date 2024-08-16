@@ -216,7 +216,7 @@ Ao clicar em uma delas vai abrir o gerenciador de stacks e lá temos essas duas 
 - Editor
     - Fazer edições em nossa stack
 
-Cada stack tem um docker-compose que fica na aba "Editar" no qual é utilizado para subir o ambiente:
+Cada stack tem um docker-compose que fica na aba "Editor" no qual é utilizado para subir o ambiente:
 
 _**Docker-compose (inbcm-dev)**_
 
@@ -238,6 +238,11 @@ _**Docker-compose (inbcm-dev)**_
         o: nfsvers=4,addr=10.10.10.100,rw     |qual o ip: 10.10.10.100 que permite ler e escrever
         device: ":/NFS_VOL/HDD/ifrn/mongodev" |
     uploads-data:                             | 
+        driver: local                         |
+        driver_opts:                          |
+        type: nfs                             |
+        o: nfsvers=4,addr=10.10.10.100,rw     |
+        device: ":/NFS_VOL/HDD/ifrn/uploadsev"|
     ------------------------------------------| 
 
     
@@ -250,7 +255,7 @@ _**Docker-compose (inbcm-dev)**_
         - mongo-data:/data/db                   |ambiente e a rede do 
         environment:                            |serviço do mongo
         MONGO_INITDB_ROOT_USERNAME: ${DB_USER}  |
-        MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}  |**image:** Imagem utilizada
+        MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}  |**image:** Aplicação utilizada
         MONGO_INITDB_DATABASE: ${DB_NAME}       |**volumes:** Armazenamento
         networks:                               |**environment:** Variáveis
         - ifrn_dev_internal_network             |de ambiente
@@ -491,5 +496,22 @@ _**Docker-compose (dev_curadoria_ifrn )**_
 Temos os seguinte desenhos lógicos para melhor visualização da infra:
 
 ![Estrutura_lógica1](/imagens/Estrutura-1.png)
+
+Servidor UNB (IP: 164.41.122.172)
+
+    - Portas abertas: (80:443)
+    - Sem acesso SSH
+
+O servidor consiste em :
+
+- 1 Cluster -> (Docker Swarm)
+- 4 Nodes -> (10.10.10.102, 10.10.10.103, 10.10.10.104)
+- 1 Node manager -> (10.10.10.101)
+
+Dentro do ambiente da UNB
+
+- 1 Banco de dados -> (10.10.10.50)
+- 1 VM (Gerenciador de arquivos) -> (10.10.10.100)
+
 ![Estrutura_lógica2](/imagens/Estrutura-2.png)
 
