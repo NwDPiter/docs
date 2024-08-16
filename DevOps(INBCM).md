@@ -88,16 +88,30 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         RUN corepack enable         | do pnpm, além de rodar um comando para ativar o corepack.
         ----------------------------|
 
-        ---------------------------------------------------------------------------------|
-        FROM base AS build                                                               |Aqui reutilizamos nossa imagem e colocamos outro apelido 
-                                                                                         |Copiamos o que tem no diretório atual para dentro de 
-        COPY . /usr/src/app                                                              |"/usr/src/app" para dentro do container
-                                                                                         |Informamos o diretório de trabalho do container ou seja, ele pode 
-        WORKDIR /usr/src/app                                                             |manipular arquivos, entre outros la dentro, rodamos o comando           
-                                                                                         |que vai gerar um cache com todo o conteúdo necessário para a 
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile |aplicação, que vai ser usado jájá além de rodarmos o comando
-        RUN pnpm build                                                                   |para compilar o código.
-        ---------------------------------------------------------------------------------|
+        --------------------------------------------------|
+        FROM base AS build                                |Aqui reutilizamos nossa imagem e colocamos outro 
+                                                          |apelido.  
+                                                          |
+                                                          |
+        COPY . /usr/src/app                               |Copiamos o que tem no 
+                                                          |diretório "/usr/src/app"
+                                                          |para dentro do container.
+                                                          |  
+                                                          |Informamos o diretório de  
+        WORKDIR /usr/src/app                              |manipulação de arquivos. 
+                                                          |rodamos o que vai gerar
+                                                          |um cache com todo o 
+                                                          |conteúdo necessário 
+                                                          |para a para comando.
+                                                          |------------------------------|
+                                                                                         |
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile |Criamos um cache temporário
+                                                                                         |do conteúdo necessário para
+                                                                                         |aplicação que vai ser usado 
+                                                                                         |jájá.
+                                                                                         |
+        RUN pnpm build                                                                   |Comando para 
+        ---------------------------------------------------------------------------------|compilar o código.
 
         ---------------------------------------|
         FROM devforth/spa-to-http              | Aqui escolhemos uma imagem adquada para nosso ambiente
@@ -117,10 +131,11 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
 
         ----------------------------------------------------------------------------------------|
         FROM base AS prod-deps                                                                  |
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile |Aqui também segue o padrão do front-end
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile |Aqui também segue o 
+        FROM base AS build                                                                      |padrão do front-end
                                                                                                 |criamos uma cache com o conteúdo necessário
-        FROM base AS build                                                                      |para rodar a aplicação e apilidamos para 
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile        |ser utilizados mais a frente.
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install--frozen-lockfile                                                                        |para rodar a aplicação e apilidamos para 
+                |ser utilizados mais a frente.
         RUN pnpm run build                                                                      |
         ----------------------------------------------------------------------------------------|    
 
@@ -247,67 +262,88 @@ _**Docker-compose (inbcm-dev)**_
         - ifrn_dev_internal_network             |de ambiente
     --------------------------------------------|**networks:** Rede
 
-    ---------------------------------------------------------------------------------------------------|
-    mongo-express:                                                                                     |     
-        image: mongo-express                                                                           |A grande diferença nesse bloco comparado com o 
-        environment:                                                                                   |anterior e a parte de (deploy:) 
-        ME_CONFIG_BASICAUTH_USERNAME: ${DB_USER}                                                       | 
-        ME_CONFIG_BASICAUTH_PASSWORD: ${DB_PASS}                                                       | 
-        ME_CONFIG_MONGODB_PORT: 27017                                                                  |Nele definimos as configurações que o traefik vai 
-        ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_USER}                                                    |precisar para pode reconhecer o container e poder 
-        ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_PASS}                                                    |fazer seu roteamento corretamente quando for  
-        ME_CONFIG_MONGODB_SERVER: mongo                                                                |solicitado, cada linha a abaixo de _labels:_ tem um 
-        depends_on:                                                                                    |significado específico, outro detalhe e o (depends_on)
-        - mongo                                                                                        |informa a esse container que depende do mongo que e
-        networks:                                                                                      |o banco de dado e o bloco acima.
-        - traefik_proxy                                                                                |
-        - ifrn_dev_internal_network                                                                    |
-        deploy:                                                                                        | 
-        labels:                                                                                        |
-            - traefik.enable=true                                                                      |Permiti o traefik identificar os containers
-            - traefik.docker.network=traefik_proxy                                                     |Especifica a rede do traefik 
-            - traefik.constraint-label=traefik-public                                                  |Garante que apenas esse container receberá a solicitação
-            - traefik.http.routers.dev-inbcm-mongoexpress-http.rule=Host(`mongoexpress.${DOMAIN}`)     |Especifica a rota HTTPS para o domínio entre ()
-            - traefik.http.routers.dev-inbcm-mongoexpress-http.entrypoints=http                        |Especifica a rota para o container quando bater na HTTP
-            - traefik.http.routers.dev-inbcm-mongoexpress-http.middlewares=https-redirect              |Redireciona o tráfego parar HTTPS
-            - traefik.http.routers.dev-inbcm-mongoexpress-https.rule=Host(`mongoexpress.${DOMAIN}`)    |Especifica o tráfeo HTTPS para o domínio entre ()
-            - traefik.http.routers.dev-inbcm-mongoexpress-https.entrypoints=https                      |Especifica a rota para o container quando bater na HTTPS
-            - traefik.http.routers.dev-inbcm-mongoexpress-https.tls=true                               |Habilita o TLS
-            - traefik.http.routers.dev-inbcm-mongoexpress-https.tls.certresolver=le                    |Especifica o Let's Encripty para geri o certificado
-            - traefik.http.services.dev-inbcm-mongoexpress.loadbalancer.server.port=8081               |Especifica a porta apenas para o container deste serviço
-    ---------------------------------------------------------------------------------------------------|
+    ---------------------------------------------------------------------|
+    mongo-express:                                                       |     
+        image: mongo-express                                             |A grande diferença nesse bloco comparado com o 
+        environment:                                                     |anterior e a parte de (deploy:) 
+        ME_CONFIG_BASICAUTH_USERNAME: ${DB_USER}                         | 
+        ME_CONFIG_BASICAUTH_PASSWORD: ${DB_PASS}                         | 
+        ME_CONFIG_MONGODB_PORT: 27017                                    |Nele definimos as configurações que o traefik vai 
+        ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_USER}                      |precisar para pode reconhecer o container e poder 
+        ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_PASS}                      |fazer seu roteamento corretamente quando for  
+        ME_CONFIG_MONGODB_SERVER: mongo                                  |solicitado, cada linha a abaixo de _labels:_ tem um 
+        depends_on:                                                      |significado específico, outro detalhe e o (depends_on)
+        - mongo                                                          |informa a esse container que depende do mongo que e
+        networks:                                                        |o banco de dado e o bloco acima.
+        - traefik_proxy                                                  |
+        - ifrn_dev_internal_network                                      |
+        deploy:                                                          | 
+        labels:                                                          |
+            - traefik.enable=true                                        |Permiti o traefik identificar os containers
+                                                                         |-------------------------|
+            - traefik.docker.network=traefik_proxy                                                 |Especifica a rede do traefik 
+                                                                                                   | 
+            - traefik.constraint-label=traefik-public                                              |Garante solicitação apenas 
+                                                                                                   |apenas para esse container 
+                                                                                                   |
+            - traefik.http.routers.dev-inbcm-mongoexpress-http.rule=Host(`mongoexpress.${DOMAIN}`) |Apropria a rota HTTPS para 
+                                                                                                   |para o domínio entre ()
+                                                                                                   |
+            - traefik.http.routers.dev-inbcm-mongoexpress-http.entrypoints=http                    |Especifica a rota HTTP
+                                                                                                   |
+            - traefik.http.routers.dev-inbcm-mongoexpress-http.middlewares=https-redirect          |Redireciona o tráfego
+                                                                                                   |para HTTPS
+                                                                                                   |
+            - traefik.http.routers.dev-inbcm-mongoexpress-https.rule=Host(`mongoexpress.${DOMAIN}`)|Apropria HTTPS para o
+                                                                                                   |domínio entre ()        
+                                                                                                   |
+            - traefik.http.routers.dev-inbcm-mongoexpress-https.entrypoints=https                  |Especifica a rota HTTPS
+                                                                                                   | 
+            - traefik.http.routers.dev-inbcm-mongoexpress-https.tls=true                           |Habilita o TLS
+                                                                                                   | 
+            - traefik.http.routers.dev-inbcm-mongoexpress-https.tls.certresolver=le                |Define o Let's Encripty 
+                                                                                                   |para geri o certificado
+                                                                                                   |
+            - traefik.http.services.dev-inbcm-mongoexpress.loadbalancer.server.port=8081           |Especifica a porta 
+                                                                                                   |apenas para o container
+                                                                                                   |deste serviço     
+    -----------------------------------------------------------------------------------------------|
 
-    -----------------------------------------------------------------------------------------------------------------------------------------------------|
-    backend:                                                                                                                                             |   
-        image: Nome_repositório_dockerhub/inbcm-backend                                                                                                  |
-        networks:                                                                                                                                        |
-        - traefik_proxy                                                                                                                                  |
-        - ifrn_dev_internal_network                                                                                                                      |
-        environment:                                                                                                                                     |
-        DB_USER: ${DB_USER}                                                                                 |Explicação|                                 |
-        DB_PASS: ${DB_PASS}                                                 |----------------------------------------------------------------------------|   
-        DB_URL: ${DB_URL}                                                   |A diferença entre esse bloco e o de cima são as duas maiores linhas         |   
-        JWT_SECRET: ${JWT_SECRET}                                           |elas apenas informão um prefixo para o domínio, por exemplo; digamos que    |  
-        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}                                 |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br         | 
-        ADMIN_SITE_URL: ${ADMIN_SITE_URL}                                   |                                                                            |   
-        depends_on:                                                         |                                                                            | 
-        - mongo                                                             |                                                                            |
-        deploy:                                                             |----------------------------------------------------------------------------|    
-        labels:                                                                                                                                          |   
-            - traefik.enable=true                                                                                                                        |
-            - traefik.docker.network=traefik_proxy                                                                                                       |
-            - traefik.constraint-label=traefik-public                                                                                                    |
-            - traefik.http.routers.dev-inbcm-backend-http.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) || Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)  |
-            - traefik.http.routers.dev-inbcm-backend-http.entrypoints=http                                                                               | 
-            - traefik.http.routers.dev-inbcm-backend-http.middlewares=https-redirect                                                                     |
-            - traefik.http.routers.dev-inbcm-backend-https.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) || Host(`admin.${DOMAIN}`) && PathPrefix(`/api`) |
-            - traefik.http.routers.dev-inbcm-backend-https.entrypoints=https                                                                             | 
-            - traefik.http.routers.dev-inbcm-backend-https.tls=true                                                                                      |
-            - traefik.http.routers.dev-inbcm-backend-https.tls.certresolver=le                                                                           |      
-            - traefik.http.services.dev-inbcm-backend.loadbalancer.server.port=3000                                                                      | 
-        volumes:                                                                                                                                         | 
-        - uploads-data:/uploads                                                                                                                          | 
-    -----------------------------------------------------------------------------------------------------------------------------------------------------|
+    ---------------------------------------------------------------------------------------------------------------------------|
+    backend:                                                                                                                   |   
+        image: Nome_repositório_dockerhub/inbcm-backend                                                                        |
+        networks:                                                                                                              |
+        - traefik_proxy                                                                                                        |
+        - ifrn_dev_internal_network                                                                                            |
+        environment:                                                                                                           |
+        DB_USER: ${DB_USER}                                                       |Explicação|                                 |
+        DB_PASS: ${DB_PASS}                         |--------------------------------------------------------------------------|   
+        DB_URL: ${DB_URL}                           |A diferença entre esse bloco e o de cima são as duas maiores linhas       |   
+        JWT_SECRET: ${JWT_SECRET}                   |elas apenas informão um prefixo para o domínio, por exemplo; digamos que  |  
+        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}         |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br       | 
+        ADMIN_SITE_URL: ${ADMIN_SITE_URL}           |                                                                          |   
+        depends_on:                                 |--------------------------------------------------------------------------|     
+        - mongo                                                                                                                |     
+        deploy:                                                                                                                |     
+        labels:                                                                                                                |   
+            - traefik.enable=true                                                                                              |
+            - traefik.docker.network=traefik_proxy                                                                             |
+            - traefik.constraint-label=traefik-public                                                                          |  
+            - traefik.http.routers.dev-inbcm-backend-http.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||                      | 
+                Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                                  | 
+                                                                                                                               | 
+            - traefik.http.routers.dev-inbcm-backend-http.entrypoints=http                                                     | 
+            - traefik.http.routers.dev-inbcm-backend-http.middlewares=https-redirect                                           |
+            - traefik.http.routers.dev-inbcm-backend-https.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||                     | 
+                 Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                                 | 
+                                                                                                                               | 
+            - traefik.http.routers.dev-inbcm-backend-https.entrypoints=https                                                   | 
+            - traefik.http.routers.dev-inbcm-backend-https.tls=true                                                            |
+            - traefik.http.routers.dev-inbcm-backend-https.tls.certresolver=le                                                 |      
+            - traefik.http.services.dev-inbcm-backend.loadbalancer.server.port=3000                                            | 
+        volumes:                                                                                                               | 
+        - uploads-data:/uploads                                                                                                | 
+    ---------------------------------------------------------------------------------------------------------------------------|
 
     --------------------------------------------------------------------------------|
     public:                                                                         |
@@ -319,10 +355,10 @@ _**Docker-compose (inbcm-dev)**_
         depends_on:                                                                 |       
         - backend                                                                   |
         - mongo                                                                     |
-        deploy:                                                                     |Aqui segue o mesmo padrão de configuração de:
-        labels:                                                                     |
-            - traefik.enable=true                                                   |network,depends_on e deploy.
-            - traefik.docker.network=traefik_proxy                                  |
+        deploy:                                                                     |Aqui segue o mesmo 
+        labels:                                                                     |padrão de configuração de:
+            - traefik.enable=true                                                   |
+            - traefik.docker.network=traefik_proxy                                  |network,depends_on e deploy.
             - traefik.constraint-label=traefik-public                               |
             - traefik.http.routers.dev-inbcm-upload-http.rule=Host(`${DOMAIN}`)     |    
             - traefik.http.routers.dev-inbcm-upload-http.entrypoints=http           |
@@ -344,10 +380,10 @@ _**Docker-compose (inbcm-dev)**_
         networks:                                                                      |     
         - traefik_proxy                                                                |
         - ifrn_dev_internal_network                                                    |
-        deploy:                                                                        |Aqui segue o mesmo padrão de configuração de:  
-        labels:                                                                        | 
-            - traefik.enable=true                                                      |network,depends_on e deploy.
-            - traefik.docker.network=traefik_proxy                                     |     
+        deploy:                                                                        |Aqui segue o mesmo 
+        labels:                                                                        |padrão de configuração de:  
+            - traefik.enable=true                                                      |
+            - traefik.docker.network=traefik_proxy                                     |network,depends_on e deploy.     
             - traefik.constraint-label=traefik-public                                  | 
             - traefik.http.routers.dev-inbcm-admin-http.rule=Host(`admin.${DOMAIN}`)   | 
             - traefik.http.routers.dev-inbcm-admin-http.entrypoints=http               |
@@ -432,18 +468,18 @@ _**Docker-compose (dev_curadoria_ifrn )**_
         APACHE_RUN_GROUP: ***                                     |  
     --------------------------------------------------------------| 
 
-    ------------------------------------------------------------------------------------------------------------|
-        deploy:                                                                                                 |
-        labels:                                                                                                 |    
-            - traefik.enable=true                                                                               |
-            - traefik.docker.network=traefik_proxy                                                              |
-            - traefik.constraint-label=traefik-public                                                           |
+    --------------------------------------------------------|
+        deploy:                                             |Essa etapa não diferente das anteriores                                               
+        labels:                                             |informa ao traefik as rotas o protocolo,                                                       
+            - traefik.enable=true                           |domínio, certificado e porta.                                                 
+            - traefik.docker.network=traefik_proxy          |                                                   
+            - traefik.constraint-label=traefik-public       |---------------------------------------------------|
                                                                                                                 |   
             - traefik.http.routers.wphomologacaocuradoria-http.rule=Host(`homologacao.curadoria.tainacan.org`)  |
             - traefik.http.routers.wphomologacaocuradoria-http.entrypoints=http                                 |
-            - traefik.http.routers.wphomologacaocuradoria-http.middlewares=https-redirect                       |Essa etapa não diferente das anteriores
-            - traefik.http.routers.wphomologacaocuradoria-https.rule=Host(`homologacao.curadoria.tainacan.org`) |informa ao traefik as rotas o protocolo,
-            - traefik.http.routers.wphomologacaocuradoria-https.entrypoints=https                               |domínio, certificado e porta.
+            - traefik.http.routers.wphomologacaocuradoria-http.middlewares=https-redirect                       |
+            - traefik.http.routers.wphomologacaocuradoria-https.rule=Host(`homologacao.curadoria.tainacan.org`) |
+            - traefik.http.routers.wphomologacaocuradoria-https.entrypoints=https                               |
             - traefik.http.routers.wphomologacaocuradoria-https.tls=true                                        |
             - traefik.http.routers.wphomologacaocuradoria-https.tls.certresolver=le                             |
             - traefik.http.services.wphomologacaocuradoria.loadbalancer.server.port=80                          |
