@@ -263,14 +263,14 @@ _**Docker-compose (inbcm-dev)**_
         ME_CONFIG_BASICAUTH_USERNAME: ${DB_USER}                         | 
         ME_CONFIG_BASICAUTH_PASSWORD: ${DB_PASS}                         | 
         ME_CONFIG_MONGODB_PORT: 27017                                    |Nele definimos as configurações que o 
-        ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_USER}                      |traefik vai precisar para pode reconhecer o 
-        ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_PASS}                      |container e poder fazer seu roteamento   
-        ME_CONFIG_MONGODB_SERVER: mongo                                  |corretamente quando-solicitado, cada linha a 
-        depends_on:                                                      |abaixo de _labels:_ tem um significado  
-        - mongo                                                          |especifico, outro detalher e o(depends_on)
-        networks:                                                        |informa a esse container que depende do mongo
-        - traefik_proxy                                                  |que e o banco de dado e o bloco acima.
-        - ifrn_dev_internal_network                                      |
+        ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_USER}                      |traefik vai precisar para pode reconhecer  
+        ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_PASS}                      |o container e poder fazer seu roteamento   
+        ME_CONFIG_MONGODB_SERVER: mongo                                  |corretamente quando solicitado, cada linha  
+        depends_on:                                                      |a abaixo de _labels:_ tem um significado  
+        - mongo                                                          |específico, outro detalher e o(depends_on)
+        networks:                                                        |informa ao container que depende de outro
+        - traefik_proxy                                                  |no caso o mongo que e o banco de dado do
+        - ifrn_dev_internal_network                                      |bloco acima.
         deploy:                                                          | 
         labels:                                                          |
             - traefik.enable=true                                        |Permiti o traefik identificar os containers
@@ -296,12 +296,13 @@ _**Docker-compose (inbcm-dev)**_
                                                                                                    |para o domínio 
                                                                                                    |entre ()        
                                                                                                    |
-            - traefik.http.routers.dev-inbcm-mongoexpress-https.entrypoints=https                  |Especifica a rota HTTPS
+            - traefik.http.routers.dev-inbcm-mongoexpress-https.entrypoints=https                  |Especifica a rota 
+                                                                                                   |HTTPS 
                                                                                                    | 
             - traefik.http.routers.dev-inbcm-mongoexpress-https.tls=true                           |Habilita o TLS
                                                                                                    | 
             - traefik.http.routers.dev-inbcm-mongoexpress-https.tls.certresolver=le                |Define o Let's 
-                                                                                                   |Encripty para 
+                                                                                                   |Encrypt para 
                                                                                                    |geri o certificado
                                                                                                    |
             - traefik.http.services.dev-inbcm-mongoexpress.loadbalancer.server.port=8081           |Especifica a porta 
@@ -320,7 +321,7 @@ _**Docker-compose (inbcm-dev)**_
         DB_PASS: ${DB_PASS}                   |--------------------------------------------------------------------------|   
         DB_URL: ${DB_URL}                     |A diferença entre esse bloco e o de cima são as duas maiores linhas       |   
         JWT_SECRET: ${JWT_SECRET}             |elas apenas informão um prefixo para o domínio, por exemplo; digamos que  |  
-        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}   |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br       | 
+        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}   |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br.       | 
         ADMIN_SITE_URL: ${ADMIN_SITE_URL}     |                                                                          |   
         depends_on:                           |--------------------------------------------------------------------------|     
         - mongo                                                                                                          |     
@@ -330,12 +331,12 @@ _**Docker-compose (inbcm-dev)**_
             - traefik.docker.network=traefik_proxy                                                                       |
             - traefik.constraint-label=traefik-public                                                                    |  
             - traefik.http.routers.dev-inbcm-backend-http.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||                | 
-                Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                            | 
+              Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                              | 
                                                                                                                          | 
             - traefik.http.routers.dev-inbcm-backend-http.entrypoints=http                                               | 
             - traefik.http.routers.dev-inbcm-backend-http.middlewares=https-redirect                                     |
             - traefik.http.routers.dev-inbcm-backend-https.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||               | 
-                 Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                           | 
+              Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                              | 
                                                                                                                          | 
             - traefik.http.routers.dev-inbcm-backend-https.entrypoints=https                                             | 
             - traefik.http.routers.dev-inbcm-backend-https.tls=true                                                      |
