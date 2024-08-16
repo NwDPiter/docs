@@ -19,26 +19,26 @@ O INBCM está dividido em 3 repositórios (**inbcm-backend**, **inbcm-admin-fron
 
     -------------------------------| 
     on:                            | 
-    workflow_dispatch:             | Esse bloco permite que o código seja executado de duas 
-    pull_request:                  | maneiras, (workflow_dispatch) permite o manual na aba
-        branches:                  | actions do github e (pull_request) permite o automático
-        - main                     | no qual definimos as branches que fara a ativação dessa
-        - development              | actions quando um pull_request fechado.
+    workflow_dispatch:             |Esse bloco permite que o código seja executado de duas 
+    pull_request:                  |maneiras, (workflow_dispatch) permite o manual na aba
+        branches:                  |actions do github e (pull_request) permite o automático
+        - main                     |no qual definimos as branches que fara a ativação dessa
+        - development              |actions quando um pull_request fechado.
         types: [closed]            |   
     -------------------------------|
 
     -------------------------------------------------|
-    jobs:                                            | Aqui é onde começa os trabalhos fazemos
-    push_to_registry:                                | uma verificação para saber so o pr foi 
-        name: Push Docker image to Registry          | fechado com um merge, caso sim, vai ini
-        if: github.event.pull_request.merged == true | ciar essa action, além de escolher qual
-        runs-on: ubuntu-latest                       | SO vai rodar essa action (ubuntu).
+    jobs:                                            |Aqui é onde começa os trabalhos, fazemos
+    push_to_registry:                                |uma verificação para saber o pr foi 
+        name: Push Docker image to Registry          |fechado com um merge, caso sim, vai ini
+        if: github.event.pull_request.merged == true |ciar essa action, além de escolher qual
+        runs-on: ubuntu-latest                       |SO vai rodar essa action (ubuntu).
     -------------------------------------------------|
 
     ----------------------------------|
-        steps:                        | Esse bloco faz um git clone do projeto para dentro da
-        - name: Check out the repo    | VM que escolhemos, no caso ubuntu, existe windows e
-            uses: actions/checkout@v3 | mac ,mas ficamos com a atual.
+        steps:                        |Esse bloco faz um git clone do projeto para dentro da
+        - name: Check out the repo    |VM que escolhemos, no caso ubuntu, existe windows e
+            uses: actions/checkout@v3 |mac ,mas ficamos com a atual.
     ----------------------------------|
 
     ------------------------------------------------------------------------|
@@ -48,15 +48,15 @@ O INBCM está dividido em 3 repositórios (**inbcm-backend**, **inbcm-admin-fron
                                                                             |branch alvo do marge
                                                                             |pois a imagem será
         - name: Set Docker repository name for development branch           |enviada para um 
-            if: github.ref == 'refs/heads/development'                      |dockerhub específico
+            if: github.ref == 'refs/heads/development'                      |dockerhub específico.
             run: echo "DOCKER_REPOSITORY=inbcm-backend" >> $GITHUB_ENV      |
     ------------------------------------------------------------------------|
 
     -------------------------------------------------|
         - name: Log in to Docker Registry            |
-            uses: docker/login-action@v3             | Aqui ocorre o login, no qual foi
-            with:                                    | definido nas secrets as variáveis
-            username: ${{ secrets.DOCKER_USERNAME }} | de login e senha para o dockerhub
+            uses: docker/login-action@v3             |Aqui ocorre o login, no qual foi
+            with:                                    |definido nas secrets as variáveis
+            username: ${{ secrets.DOCKER_USERNAME }} |de login e senha para o dockerhub.
             password: ${{ secrets.DOCKER_PASSWORD }} |
     -------------------------------------------------|
 
@@ -106,10 +106,10 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         RUN pnpm build                                                                   |Comando para 
         ---------------------------------------------------------------------------------|compilar o código.
 
-        ---------------------------------------|
-        FROM devforth/spa-to-http              | Aqui escolhemos uma imagem adquada para nosso ambiente
-        COPY --from=build /usr/src/app/dist .  | Copiamos o conteúdo do cache temporário que foi criado 
-        ---------------------------------------| na imagem anterior apelidada de "build" para nosso container.
+        ---------------------------------------|Aqui escolhemos uma imagem adquada para nosso ambiente
+        FROM devforth/spa-to-http              |e copiamos o conteúdo do cache temporário que foi criado 
+        COPY --from=build /usr/src/app/dist .  |na imagem anterior apelidada de "build" para o caminho
+        ---------------------------------------|"/usr/src/app/dist" dentro do container.
 
 - Dockerfile back-end
 
@@ -123,15 +123,15 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         -----------------------------|
 
         ----------------------------------------------------------------------------------------|
-        FROM base AS prod-deps                                                                  |
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile |Aqui também segue o 
-                                                                                                |padrão do front-end
-        FROM base AS build                                                                      |criamos uma cache com 
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install--frozen-lockfile         |o conteúdo necessário
-                                                                                                |para rodar a aplicação
-        RUN pnpm run build                                                                      |e apilidamos para ser 
-                                                                                                |utilizados mais a 
-        ----------------------------------------------------------------------------------------|frente.
+        FROM base AS prod-deps                                                                  |Aqui também segue o 
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile |padrão do front-end
+                                                                                                |criamos uma cache com
+        FROM base AS build                                                                      |o conteúdo necessário 
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install--frozen-lockfile         |para rodar a aplicação
+                                                                                                |e apilidamos para ser 
+        RUN pnpm run build                                                                      |utilizados mais a 
+                                                                                                |frente.
+        ----------------------------------------------------------------------------------------|
 
         -----------------------------------------------------------|
         FROM base                                                  |Nesse último bloco copiamos
@@ -143,7 +143,7 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         -----------------------------------------------------------|iniciar.
 
 
-### Exemplo do passo a passo de como gera uma imagem usando docker (Método manual):
+### Exemplo do passo a passo de como gerar uma imagem usando docker (Método manual):
 
 OBS: Supondo que você já tenha o docker em sua máquina, caso não, segue o site oficial para instalação:
 
@@ -159,12 +159,12 @@ https://docs.docker.com/engine/install/  (Aqui vai encontra a instalção tanto 
 
     CMD ["echo","Hello"]
 
-1.3 Logo seu Dockerfile deve ter esse conteúdo.
+1.3 Logo, seu Dockerfile deve ter esse conteúdo.
 
     FROM alpine:latest
     CMD ["echo","Hello"]     
 
-2º Agora que temos nosso Dockerfile vamos buildar/gerar uma imagem.
+2º Agora que temos nosso Dockerfile, vamos buildar/gerar uma imagem.
 
 ![Docker_build](/imagens/Docker_build.png)
 
@@ -198,6 +198,8 @@ Portainer é uma ferramenta de gerenciamento de containers que oferece uma inter
 
 Acessar portainer: https://portainer.tainacan.org
 
+- Necessário login e senha, contate o ADM.
+
 No portainer atualmente temos 4 stacks:
 
 |        Stacks             | Branchs|                                 
@@ -225,20 +227,20 @@ _**Docker-compose (inbcm-dev)**_
     ------------------------------|
     networks:                     | 
     ifrn_dev_internal_network:    |Aqui informamos ao compose a rede 
-    traefik_proxy:                |compartilhada entre os containers
+    traefik_proxy:                |compartilhada entre os containers.
         external: true            |  
     ------------------------------|
 
     ------------------------------------------|
-    volumes:                                  |Esse bloco informa os volumes, ou seja    
-    mongo-data:                               |onde será armazenado (Declarações, recibos
-        driver: local                         |entre outros...)
-        driver_opts:                          |
-        type: nfs                             |Os volumes são armazenadas em um host diferente no 
-        o: nfsvers=4,addr=10.10.10.100,rw     |qual o ip: 10.10.10.100 que permite ler e escrever
+    volumes:                                  |   
+    mongo-data:                               |
+        driver: local                         |Esse bloco informa os volumes, ou seja 
+        driver_opts:                          |onde será armazenado (Declarações, recibos
+        type: nfs                             |entre outros...)
+        o: nfsvers=4,addr=10.10.10.100,rw     |
         device: ":/NFS_VOL/HDD/ifrn/mongodev" |
-    uploads-data:                             | 
-        driver: local                         |
+    uploads-data:                             |Os volumes são armazenadas em um host diferente no  
+        driver: local                         |qual o ip: 10.10.10.100 que permite ler e escrever.
         driver_opts:                          |
         type: nfs                             |
         o: nfsvers=4,addr=10.10.10.100,rw     |
@@ -253,7 +255,7 @@ _**Docker-compose (inbcm-dev)**_
         image: mongo                            |Aqui informamos a imagem
         volumes:                                |os volumes,variáveis 
         - mongo-data:/data/db                   |ambiente e a rede do 
-        environment:                            |serviço do mongo
+        environment:                            |serviço do mongo.
         MONGO_INITDB_ROOT_USERNAME: ${DB_USER}  |
         MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}  |**image:** Aplicação utilizada
         MONGO_INITDB_DATABASE: ${DB_NAME}       |**volumes:** Armazenamento
@@ -272,7 +274,7 @@ _**Docker-compose (inbcm-dev)**_
         ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_PASS}                      |o container e poder fazer seu roteamento   
         ME_CONFIG_MONGODB_SERVER: mongo                                  |corretamente quando solicitado, cada linha  
         depends_on:                                                      |a abaixo de _labels:_ tem um significado  
-        - mongo                                                          |específico, outro detalher e o(depends_on)
+        - mongo                                                          |específico, outro detalhe e o(depends_on)
         networks:                                                        |informa ao container que depende de outro
         - traefik_proxy                                                  |no caso o mongo que e o banco de dado do
         - ifrn_dev_internal_network                                      |bloco acima.
@@ -325,8 +327,8 @@ _**Docker-compose (inbcm-dev)**_
         DB_USER: ${DB_USER}                                                 |Explicação|                               |
         DB_PASS: ${DB_PASS}                   |------------------------------------------------------------------------|   
         DB_URL: ${DB_URL}                     |A diferença entre esse bloco e o de cima são as duas maiores linhas     |   
-        JWT_SECRET: ${JWT_SECRET}             |elas apenas informão um prefixo para o domínio, por exemplo; digamos que|  
-        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}   |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br.    | 
+        JWT_SECRET: ${JWT_SECRET}             |elas apenas informam um prefixo para o domínio, por exemplo; digamos que|  
+        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}   |o domínion é  (exemplo.com.br) nesse caso ficaria api.exemplo.com.br.   | 
         ADMIN_SITE_URL: ${ADMIN_SITE_URL}     |                                                                        |   
         depends_on:                           |------------------------------------------------------------------------|     
         - mongo                                                                                                        |     
@@ -430,7 +432,7 @@ _**Docker-compose (dev_curadoria_ifrn )**_
         networks:                                                 |rede e variável de ambiente.
         - traefik_proxy                                           |
         environment:                                              |
-        SKIP_WP_INSTALL: "false"                                  |          
+        SKIP_WP_INSTALL: ***                                      |          
     --------------------------------------------------------------|
         #site config:                                             |  
         SITE_LANGUAGE: pt_BR                                      |  
@@ -475,7 +477,7 @@ _**Docker-compose (dev_curadoria_ifrn )**_
     --------------------------------------------------------------| 
 
     --------------------------------------------------------|
-        deploy:                                             |Essa etapa não diferente das
+        deploy:                                             |Essa etapa não difere das
         labels:                                             |anteriores informa ao traefik 
             - traefik.enable=true                           |as rotas o protocolo, domínio,
             - traefik.docker.network=traefik_proxy          |certificado e rotas.          
