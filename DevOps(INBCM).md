@@ -125,13 +125,12 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         ----------------------------------------------------------------------------------------|
         FROM base AS prod-deps                                                                  |
         RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile |Aqui também segue o 
-        FROM base AS build                                                                      |padrão do front-end
-                                                                                                |criamos uma cache com 
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm                                  |o conteúdo necessário
-        install--frozen-lockfile                                                                |para rodar a aplicação
-                                                                                                |e apilidamos para ser 
+                                                                                                |padrão do front-end
+        FROM base AS build                                                                      |criamos uma cache com 
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install--frozen-lockfile         |o conteúdo necessário
+                                                                                                |para rodar a aplicação
+        RUN pnpm run build                                                                      |e apilidamos para ser 
                                                                                                 |utilizados mais a frente.
-        RUN pnpm run build                                                                      |
         ----------------------------------------------------------------------------------------|    
 
         -----------------------------------------------------------|
