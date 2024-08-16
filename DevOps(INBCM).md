@@ -310,41 +310,41 @@ _**Docker-compose (inbcm-dev)**_
                                                                                                    |container deste 
     -----------------------------------------------------------------------------------------------|serviço.
 
-    ---------------------------------------------------------------------------------------------------------------------|
-    backend:                                                                                                             |   
-        image: Nome_repositório_dockerhub/inbcm-backend                                                                  |
-        networks:                                                                                                        |
-        - traefik_proxy                                                                                                  |
-        - ifrn_dev_internal_network                                                                                      |
-        environment:                                                                                                     |
-        DB_USER: ${DB_USER}                                                 |Explicação|                                 |
-        DB_PASS: ${DB_PASS}                   |--------------------------------------------------------------------------|   
-        DB_URL: ${DB_URL}                     |A diferença entre esse bloco e o de cima são as duas maiores linhas       |   
-        JWT_SECRET: ${JWT_SECRET}             |elas apenas informão um prefixo para o domínio, por exemplo; digamos que  |  
-        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}   |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br.       | 
-        ADMIN_SITE_URL: ${ADMIN_SITE_URL}     |                                                                          |   
-        depends_on:                           |--------------------------------------------------------------------------|     
-        - mongo                                                                                                          |     
-        deploy:                                                                                                          |     
-        labels:                                                                                                          |   
-            - traefik.enable=true                                                                                        |
-            - traefik.docker.network=traefik_proxy                                                                       |
-            - traefik.constraint-label=traefik-public                                                                    |  
-            - traefik.http.routers.dev-inbcm-backend-http.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||                | 
-              Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                              | 
-                                                                                                                         | 
-            - traefik.http.routers.dev-inbcm-backend-http.entrypoints=http                                               | 
-            - traefik.http.routers.dev-inbcm-backend-http.middlewares=https-redirect                                     |
-            - traefik.http.routers.dev-inbcm-backend-https.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||               | 
-              Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                              | 
-                                                                                                                         | 
-            - traefik.http.routers.dev-inbcm-backend-https.entrypoints=https                                             | 
-            - traefik.http.routers.dev-inbcm-backend-https.tls=true                                                      |
-            - traefik.http.routers.dev-inbcm-backend-https.tls.certresolver=le                                           |
-            - traefik.http.services.dev-inbcm-backend.loadbalancer.server.port=3000                                      | 
-        volumes:                                                                                                         | 
-        - uploads-data:/uploads                                                                                          | 
-    ---------------------------------------------------------------------------------------------------------------------|
+    -------------------------------------------------------------------------------------------------------------------|
+    backend:                                                                                                           |   
+        image: Nome_repositório_dockerhub/inbcm-backend                                                                |
+        networks:                                                                                                      |
+        - traefik_proxy                                                                                                |
+        - ifrn_dev_internal_network                                                                                    |
+        environment:                                                                                                   |
+        DB_USER: ${DB_USER}                                                 |Explicação|                               |
+        DB_PASS: ${DB_PASS}                   |------------------------------------------------------------------------|   
+        DB_URL: ${DB_URL}                     |A diferença entre esse bloco e o de cima são as duas maiores linhas     |   
+        JWT_SECRET: ${JWT_SECRET}             |elas apenas informão um prefixo para o domínio, por exemplo; digamos que|  
+        PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}   |o domínion é  (exmplo.com.br) nesse caso ficaria api.exemplo.com.br.    | 
+        ADMIN_SITE_URL: ${ADMIN_SITE_URL}     |                                                                        |   
+        depends_on:                           |------------------------------------------------------------------------|     
+        - mongo                                                                                                        |     
+        deploy:                                                                                                        |     
+        labels:                                                                                                        |   
+            - traefik.enable=true                                                                                      |
+            - traefik.docker.network=traefik_proxy                                                                     |
+            - traefik.constraint-label=traefik-public                                                                  |  
+            - traefik.http.routers.dev-inbcm-backend-http.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||              | 
+              Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                            | 
+                                                                                                                       | 
+            - traefik.http.routers.dev-inbcm-backend-http.entrypoints=http                                             | 
+            - traefik.http.routers.dev-inbcm-backend-http.middlewares=https-redirect                                   |
+            - traefik.http.routers.dev-inbcm-backend-https.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`) ||             | 
+              Host(`admin.${DOMAIN}`) && PathPrefix(`/api`)                                                            | 
+                                                                                                                       | 
+            - traefik.http.routers.dev-inbcm-backend-https.entrypoints=https                                           | 
+            - traefik.http.routers.dev-inbcm-backend-https.tls=true                                                    |
+            - traefik.http.routers.dev-inbcm-backend-https.tls.certresolver=le                                         |
+            - traefik.http.services.dev-inbcm-backend.loadbalancer.server.port=3000                                    | 
+        volumes:                                                                                                       | 
+        - uploads-data:/uploads                                                                                        | 
+    -------------------------------------------------------------------------------------------------------------------|
 
     --------------------------------------------------------------------------------|
     public:                                                                         |
