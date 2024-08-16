@@ -65,7 +65,7 @@ O INBCM está dividido em 3 repositórios (**inbcm-backend**, **inbcm-admin-fron
             uses: docker/build-push-action@v6 |a partir do Dockerfile que está no repositório
             with:                             |e feito o push para o dockerhub.
             context: .                        |
-            file: ./Dockerfile                |_______________________________________
+            file: ./Dockerfile                |--------------------------------------|
             push: true                                                               |
             tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_REPOSITORY }}:latest |
     ---------------------------------------------------------------------------------|
@@ -92,17 +92,10 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         FROM base AS build                                |Aqui reutilizamos nossa imagem e colocamos outro 
                                                           |apelido.  
                                                           |
-                                                          |
-        COPY . /usr/src/app                               |Copiamos o que tem no 
-                                                          |diretório "/usr/src/app"
+        COPY . /usr/src/app                               |Copiamos o que tem no diretório "/usr/src/app"
                                                           |para dentro do container.
-                                                          |  
-                                                          |Informamos o diretório de  
-        WORKDIR /usr/src/app                              |manipulação de arquivos. 
-                                                          |rodamos o que vai gerar
-                                                          |um cache com todo o 
-                                                          |conteúdo necessário 
-                                                          |para a para comando.
+                                                          |
+        WORKDIR /usr/src/app                              |Informamos o diretório de manipulação de arquivos.
                                                           |------------------------------|
                                                                                          |
         RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile |Criamos um cache temporário
@@ -133,9 +126,11 @@ Em nossos repositórios há 3 Dockerfiles dois identicos para o front-end e um a
         FROM base AS prod-deps                                                                  |
         RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile |Aqui também segue o 
         FROM base AS build                                                                      |padrão do front-end
-                                                                                                |criamos uma cache com o conteúdo necessário
-        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install--frozen-lockfile                                                                        |para rodar a aplicação e apilidamos para 
-                |ser utilizados mais a frente.
+                                                                                                |criamos uma cache com 
+        RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm                                  |o conteúdo necessário
+        install--frozen-lockfile                                                                |para rodar a aplicação
+                                                                                                |e apilidamos para ser 
+                                                                                                |utilizados mais a frente.
         RUN pnpm run build                                                                      |
         ----------------------------------------------------------------------------------------|    
 
@@ -469,12 +464,11 @@ _**Docker-compose (dev_curadoria_ifrn )**_
     --------------------------------------------------------------| 
 
     --------------------------------------------------------|
-        deploy:                                             |Essa etapa não diferente das anteriores                                               
-        labels:                                             |informa ao traefik as rotas o protocolo,                                                       
-            - traefik.enable=true                           |domínio, certificado e porta.                                                 
-            - traefik.docker.network=traefik_proxy          |                                                   
+        deploy:                                             |Essa etapa não diferente das
+        labels:                                             |anteriores informa ao traefik 
+            - traefik.enable=true                           |as rotas o protocolo, domínio,
+            - traefik.docker.network=traefik_proxy          |certificado e rotas.          
             - traefik.constraint-label=traefik-public       |---------------------------------------------------|
-                                                                                                                |   
             - traefik.http.routers.wphomologacaocuradoria-http.rule=Host(`homologacao.curadoria.tainacan.org`)  |
             - traefik.http.routers.wphomologacaocuradoria-http.entrypoints=http                                 |
             - traefik.http.routers.wphomologacaocuradoria-http.middlewares=https-redirect                       |
