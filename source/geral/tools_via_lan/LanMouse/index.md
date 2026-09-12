@@ -3,7 +3,7 @@
 
 Esta documentação descreve a arquitetura, instalação, fluxo de comunicação e configuração persistente para compartilhamento de teclado e mouse entre um nó emissor (**Pop!_OS**) e um nó receptor (**Ubuntu**) na mesma rede local.
 
-## 1. Arquitetura e Fluxo de Comunicação
+1. Arquitetura e Fluxo de Comunicação
 
 O **Lan Mouse** opera em um modelo cliente-servidor para tráfego UDP criptografado via **DTLS** (Datagram Transport Layer Security).
 
@@ -20,7 +20,7 @@ O **Lan Mouse** opera em um modelo cliente-servidor para tráfego UDP criptograf
 - **Ubuntu (Receptor):** Escuta na porta `4242/UDP` e injeta os eventos recebidos diretamente na sessão de usuário (`enable_emulation = true`).
     
 
-## 2. Dependências do Sistema
+2. Dependências do Sistema
 
 Para compilar ou executar o binário do Lan Mouse em distribuições baseadas em Debian/Ubuntu, os seguintes pacotes são obrigatórios:
 
@@ -41,7 +41,7 @@ sudo apt update
 sudo apt install -y libei-dev libxkbcommon-dev libglib2.0-0
 ```
 
-## 3. Instalação do Executável
+3. Instalação do Executável
 
 Colocar o binário no diretório `/usr/local/bin` garante conformidade com o FHS (_Filesystem Hierarchy Standard_) e disponibiliza o comando no `PATH` do sistema sem sobrescrever o gerenciador de pacotes (`apt`).
 
@@ -51,7 +51,7 @@ chmod +x lan-mouse-linux-x86_64
 sudo mv lan-mouse-linux-x86_64 /usr/local/bin/lan-mouse
 ```
 
-## 4. Configuração da Rede e Firewall
+4. Configuração da Rede e Firewall
 
 O serviço de escuta do Lan Mouse opera por padrão na porta **`4242/UDP`**.
 
@@ -68,21 +68,21 @@ sudo ss -tulnp | grep lan-mouse
 # Retorno esperado: UNCONN 0 0 0.0.0.0:4242
 ```
 
-## 5. Configuração via interface
+5. Configuração via interface
 
-### 5.1. Máquina Emissora (Pop!_OS)
+-   5.1. Máquina Emissora (Pop!_OS)
 
 Abra a interface do Lan-mouse e clique em "+ Add" e adicione o ip da máquina alvo e seleciona em qual posição a tela do outro pc vai ficar, após adicionar e ativar a opção de conexão, vá para a próxima config
 
-#### 5.2. Máquina Receptora (Ubuntu/popos)
+-   5.2. Máquina Receptora (Ubuntu/popos)
 
 Ná máquina distino deixe o lan-mouse aberto e volte para o popos mova o mouser para a borda da tela e espere aparecer na tela do ubuntu um pedido de autorização, quando aparecer de um nome, autorize e pronto. Deve funcinar.
 
-## 6. Automação e Persistência via Systemd (Serviço de Usuário)
+6. Automação e Persistência via Systemd (Serviço de Usuário)
 
 Para que o daemon do Lan Mouse inicie automaticamente no Boot sem depender da interface gráfica, configure um serviço Systemd de usuário em ambas as máquinas.
 
-### 6.1. Criar a Unidade de Serviço
+- 6.1. Criar a Unidade de Serviço
 
 Arquivo: `~/.config/systemd/user/lan-mouse.service`
 
@@ -100,7 +100,7 @@ RestartSec=5s
 WantedBy=graphical-session.target
 ```
 
-### 6.2. Ativar e Iniciar o Serviço
+-   6.2. Ativar e Iniciar o Serviço
 
 Execute os comandos em ambos os sistemas:
 
@@ -115,7 +115,7 @@ systemctl --user enable --now lan-mouse.service
 systemctl --user status lan-mouse.service
 ```
 
-## 7. Troubleshooting e Diagnóstico Rápido
+7. Troubleshooting e Diagnóstico Rápido
 
 - **Erro `emulation is disabled on target device`:** O arquivo `config.toml` do receptor está com `enable_emulation = false`.     
     
