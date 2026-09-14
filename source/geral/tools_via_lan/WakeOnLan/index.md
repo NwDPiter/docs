@@ -88,7 +88,7 @@ wakeonlan -i <REDE_DO_PC> -p 7 ou 8 <MAC_DO_PC>
 ```
 
 ::: {note}
-- <REDE_DO_PC>  -> O padrão é 255.255.255.255 você deve modifcar com base na rede do pc, use:(ip -br a)
+- <REDE_DO_PC>  -> O padrão é 255.255.255.0 você deve modifcar com base na rede do pc, use:(ip -br a)
 
 - 7 ou 8 -> É preciso validar em qual vai funcionar
 
