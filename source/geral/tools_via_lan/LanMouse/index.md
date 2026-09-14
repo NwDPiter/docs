@@ -1,5 +1,4 @@
 # LanMouse
-## Documentação Técnica: KVM via Software com Lan Mouse (Pop!_OS / Ubuntu)
 
 Esta documentação descreve a arquitetura, instalação, fluxo de comunicação e configuração persistente para compartilhamento de teclado e mouse entre um nó emissor (**Pop!_OS**) e um nó receptor (**Ubuntu**) na mesma rede local.
 
