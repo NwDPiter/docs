@@ -4,4 +4,5 @@
 :maxdepth: 2
 WakeOnLan/index
 LanMouse/index
+SSH/index
 ```

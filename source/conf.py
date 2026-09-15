@@ -37,7 +37,7 @@ html_theme = 'sphinx_book_theme'
 #     "show_nav_level": 2, 
 # }
 
-html_static_path = ['_static']
+html_static_path = ['_static','geral/imgs']
 
 myst_enable_extensions = [
     "tasklist",
