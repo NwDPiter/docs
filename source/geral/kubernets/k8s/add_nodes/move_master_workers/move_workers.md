@@ -1,46 +1,66 @@
-# Add ou Del Masters
+# Add ou Del Workers
 
-
-## Add Masters
+## Add Workers
 
 1. Em qualquer master execute:
-
-```bash
+```sh
 kubeadm token create --print-join-command
 ```
 
-2. Pegue a saída e execute no worker
+2. Pegue  a saída e execute no worker
 
-```bash
-#EX:
+```sh
 kubeadm join 192.168.1.100:6443 --token xxx --discovery-token-ca-cert-hash sha256:xxx
 ```
 
-## DEL MASTER
+---
 
-### Resetando um master (Demora um pouco)
+## Removendo worker do cluster:
 
-```bash
-# 1. Reset do kubeadm
-sudo kubeadm reset -f
-
-# 2. Remover diretórios de configuração
-sudo rm -rf /etc/kubernetes/
-sudo rm -rf /var/lib/etcd/
-sudo rm -rf /var/lib/kubelet/
-
-# 3. Remover configurações do kube-vip (se existirem)
-kubectl delete daemonset -n kube-system kube-vip-ds 2>/dev/null
-kubectl delete configmap -n kube-system kubevip 2>/dev/null
-
-# 4. Limpar o kubeconfig local
-rm -rf ~/.kube/
-
-# 5. Reiniciar o kubelet
-sudo systemctl restart kubelet
-
-# 6. Verificar se o reset foi completo
-sudo kubeadm reset phase cleanup-node
+1. Trava o nó para não receber mais pods
+```sh
+kubectl cordon <nome-do-node>
+```
+2. Drenar os pods:
+```sh
+kubectl drain <nome-do-worker> --ignore-daemonsets --delete-emptydir-data
 ```
 
-Limpeza
+3. Deletar o nó
+```sh
+kubectl delete node <nome-do-node>
+```
+---
+
+## Limpando worker
+1. Limpa o worker
+```sh
+sudo kubeadm reset
+```
+
+2. Remover config da CNI:
+```sh
+sudo rm -rf /etc/cni/net.d
+sudo rm -rf /var/lib/cni/
+```
+
+3. Remover configs locais
+```sh
+sudo rm -rf /var/lib/kubelet/*
+sudo rm -rf /etc/kubernetes/
+sudo rm -rf ~/.kube
+```
+
+4. Resetar regras do iptables
+```sh
+sudo iptables -F
+sudo iptables -X
+sudo iptables -t nat -F
+sudo iptables -t nat -X
+```
+
+5. Resetar serviços
+```sh
+sudo systemctl restart kubelet
+sudo systemctl restart containerd
+```

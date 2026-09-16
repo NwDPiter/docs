@@ -68,12 +68,11 @@ cgroupDriver: systemd
 EOF
 ```
 
-::::{grid} 3
+::::{grid} 2
 :::{grid-item-card} 🔍 (Explicação do arquivo acima)
 :link: explicacoes/kubevip
 :link-type: doc
 :shadow: sm
-:columns: 5
 :::
 ::::
 

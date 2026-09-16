@@ -1,4 +1,4 @@
-# Add ou Del Master no cluster
+# Add ou Del Master
 
 
 ## Add Master
@@ -62,12 +62,12 @@ sudo systemctl restart kubelet
 ```
 
 6. Verificar se o reset foi completo:
-
 ```bash
 sudo kubeadm reset phase cleanup-node
-​```
+```
+---
 
- 
+### Removendo configurações
 
 1. Remover configurações restantes do Calico (se houver)
 ```bash
@@ -75,40 +75,62 @@ sudo rm -rf /var/lib/calico/
 sudo rm -rf /etc/cni/net.d/
 ```
 
-# 2. Limpar iptables (regras de rede)
+2. Limpar iptables (regras de rede)
+```bash
 sudo iptables -F
 sudo iptables -t nat -F
 sudo iptables -t mangle -F
 sudo iptables -X
+```
 
-# 3. Limpar IPVS (se usado)
+
+3. Limpar IPVS (se usado)
+```bash
 sudo ipvsadm -C 2>/dev/null
+```
 
-# 4. Remover interfaces de rede virtuais (se existirem)
+4. Remover interfaces de rede virtuais (se existirem)
+```bash
 sudo ip link delete cni0 2>/dev/null
 sudo ip link delete flannel.1 2>/dev/null
+```
 
-# 5. Parar e limpar o kubelet completamente
+5. Parar e limpar o kubelet completamente
+```bash
 sudo systemctl stop kubelet
 sudo rm -rf /var/lib/kubelet/
 sudo rm -rf /var/lib/kube-proxy
+```
 
-# 6. Remover arquivos de configuração do containerd (opcional)
+6. Remover arquivos de configuração do containerd (opcional)
+```bash
 sudo rm -rf /var/lib/rancher/
+```
 
-# 1. Reiniciar o containerd
+---
+### Últimas validações
+
+1. Reiniciar o containerd
+```bash
 sudo systemctl restart containerd
+```
 
-# 2. Reiniciar o kubelet
+2. Reiniciar o kubelet
+```bash
 sudo systemctl restart kubelet
+```
 
-# 3. Verificar se os serviços estão rodando
+3. Verificar se os serviços estão rodando
+```bash
 sudo systemctl status containerd --no-pager
 sudo systemctl status kubelet --no-pager
+```
 
-# 7. Remover todos os containers parados (Exited)
+7. Remover todos os containers parados (Exited)
+```bash
 sudo crictl rm -a
+```
 
-# 8. Verificar se não há mais containers
+8. Verificar se não há mais containers
+```bash
 sudo crictl ps -a
-​

@@ -1,4 +1,4 @@
-# 3 - Interagindo com nodes no clust
+# 3 - Interagindo com nodes no cluster
 
 ```{toctree}
 :maxdepth: 2
